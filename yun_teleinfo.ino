@@ -1,3 +1,5 @@
+#include <AltSoftSerial.h>
+
 
 // Possible commands are listed here:
 //
@@ -14,7 +16,7 @@
 #include <SoftwareSerial.h>
 //#include <AltSoftSerial.h>
 
-//AltSoftSerial altSerial;
+AltSoftSerial altSerial;
 
 
 
@@ -23,11 +25,11 @@
 // will forward there all the HTTP requests for us.
 YunServer server;
 
-SoftwareSerial cptSerial(7, 8);
+//SoftwareSerial cptSerial(7, 8);
 
 
 void setup() {
-  cptSerial.begin(1200);
+  altSerial.begin(1200);
   
   // Bridge startup
 //  pinMode(13,OUTPUT);
@@ -84,7 +86,6 @@ void process(YunClient client) {
 }
 
 void collectTeleinfo(YunClient client) {
-  client.print(F("teleinfo launched"));
   
   /***************** Teleinfo configuration part *******************/
   char CaractereRecu ='\0';
@@ -94,8 +95,8 @@ void collectTeleinfo(YunClient client) {
        
     while(CaractereRecu != 0x02) // boucle jusqu'a "Start Text 002" début de la trame
     {
-       if (cptSerial.available()) {
-         CaractereRecu = cptSerial.read() & 0x7F;
+       if (altSerial.available()) {
+         CaractereRecu = altSerial.read() & 0x7F;
        }
     }
 //digitalWrite(13,1);
@@ -103,8 +104,8 @@ void collectTeleinfo(YunClient client) {
     i=0; 
     while(CaractereRecu != 0x03) // || !trame_ok ) // Tant qu'on est pas arrivé à "EndText 003" Fin de trame ou que la trame est incomplète
     { 
-      if (cptSerial.available()) {
-          CaractereRecu = cptSerial.read() & 0x7F;
+      if (altSerial.available()) {
+          CaractereRecu = altSerial.read() & 0x7F;
   	  Trame[i++]=CaractereRecu;
       }	
     }
@@ -113,7 +114,6 @@ void collectTeleinfo(YunClient client) {
     client.print(Trame);
        
   
-  client.print(F("teleinfo read"));
 }
 
 void digitalCommand(YunClient client) {
